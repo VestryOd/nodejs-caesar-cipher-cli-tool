@@ -1,0 +1,27 @@
+{
+  "name": "caesar-cipher-cli-tool",
+  "version": "1.0.0",
+  "description": "RSSchool Node.js course. Task: https://github.com/rolling-scopes-school/nodejs-course-template/blob/master/TASKS.md#task-1-caesar-cipher-cli-tool",
+  "main": "index.js",
+  "scripts": {
+    "test": "node start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VestryOd/nodejs-caesar-cipher-cli-tool.git"
+  },
+  "keywords": [
+    "node.js",
+    "js",
+    "cli"
+  ],
+  "author": "Kaspriv Maksym",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/VestryOd/nodejs-caesar-cipher-cli-tool/issues"
+  },
+  "homepage": "https://github.com/VestryOd/nodejs-caesar-cipher-cli-tool#readme",
+  "dependencies": {
+    "minimist": "^1.2.5"
+  }
+}
