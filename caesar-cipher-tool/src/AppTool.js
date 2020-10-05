@@ -1,7 +1,8 @@
 const { pipeline } = require('stream');
 const fs = require('fs');
-const path = require('path');
 const TransformCaesarCipher = require('./TransformCaesarCipher');
+const { paramsErrors, filesErrors } = require('./constants');
+const { resolve } = require('path');
 
 class AppTool {
   constructor(props) {
@@ -14,49 +15,63 @@ class AppTool {
 
   checkProps(props) {
     if (!props.shift || props.shift <= 0 || typeof props.shift !== 'number') {
-      throw 'Please, input valid shift an integer, greater or equal of zero';
+      throw `${paramsErrors.shift}`;
     }
     if (!props.action || (props.action !== 'encode' && props.action !== 'decode')) {
-      throw 'Please, input which action do you prefer - encode or decode';
+      throw `${paramsErrors.action}`;
     }
     if (props.input && typeof props.input !== 'string') {
-      throw 'Please, input correct path to input file';
+      throw `${paramsErrors.input}`;
     }
     if (props.output && typeof props.output !== 'string') {
-      throw 'Please, input correct path to output file';
-    }
-    try {
-      fs.access(props.input, (err) => {
-        throw 'Please, input correct path to existing input file or give to the file relevant permissions';
-      })
-    } catch (error) {
-      throw error;
-    }
-    try {
-      fs.access(props.output, (err) => {
-        throw 'Please, input correct path to existing output file or give to the file relevant permissions';
-      })
-    } catch (error) {
-      throw error;
+      throw `${paramsErrors.output}`;
     }
   }
 
   render() {
-    pipeline(
-      this.input ? fs.createReadStream(this.input) : process.stdin,
-      new TransformCaesarCipher({
-        shift: this.shift,
-        action: this.action
+
+    Promise.all([
+      new Promise((res, rej) => {
+        this.input
+        ? fs.access(this.input, fs.constants.F_OK, (err) => {
+          if (err) {
+            throw `${filesErrors.input}`
+          } else res();
+        })
+        : res();
+      }), 
+      new Promise((res, rej) => {
+        this.output
+        ? fs.access(this.output, fs.constants.F_OK, (err) => {
+          if (err) {
+            throw `${filesErrors.output}`
+          } else res();
+        })
+        : res();
       }),
-      this.output
-        ? fs.createWriteStream(this.output)
-        : process.stdout,
-      err => {
-        if (err) {
-          throw new Error(err);
+    ])
+    .then(
+      () => pipeline(
+        this.input ? fs.createReadStream(this.input) : process.stdin,
+        new TransformCaesarCipher({
+          shift: this.shift,
+          action: this.action
+        }),
+        this.output
+          ? fs.createWriteStream(this.output, { flags: 'a' })
+          : process.stdout,
+        err => {
+          if (err) {
+            throw new Error(err);
+          }
         }
-      }
-    );
+      )
+    )
+    .catch((err) => {
+      throw error;
+    })
+
+    
   }
 };
 

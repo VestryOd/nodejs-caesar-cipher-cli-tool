@@ -18,7 +18,7 @@ class TransformCaesarCipher extends Transform {
 
     chunk = this.passingAlphabet(chunk);
 
-    callback(null, chunk);
+    callback(null, `${chunk}\n`);
   }
 
     checkChar(char) {
