@@ -19,6 +19,26 @@ class AppTool {
     if (!props.action || (props.action !== 'encode' && props.action !== 'decode')) {
       throw 'Please, input which action do you prefer - encode or decode';
     }
+    if (props.input && typeof props.input !== 'string') {
+      throw 'Please, input correct path to input file';
+    }
+    if (props.output && typeof props.output !== 'string') {
+      throw 'Please, input correct path to output file';
+    }
+    try {
+      fs.access(props.input, (err) => {
+        throw 'Please, input correct path to existing input file or give to the file relevant permissions';
+      })
+    } catch (error) {
+      throw error;
+    }
+    try {
+      fs.access(props.output, (err) => {
+        throw 'Please, input correct path to existing output file or give to the file relevant permissions';
+      })
+    } catch (error) {
+      throw error;
+    }
   }
 
   render() {
@@ -29,7 +49,7 @@ class AppTool {
         action: this.action
       }),
       this.output
-        ? fs.createWriteStream(this.output, { flags: 'a' })
+        ? fs.createWriteStream(this.output)
         : process.stdout,
       err => {
         if (err) {
